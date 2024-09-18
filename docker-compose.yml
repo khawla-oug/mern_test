@@ -1,0 +1,34 @@
+version: '3'
+services:
+  backend:
+    build:
+      context: ./mern_project  # Point to your main project folder
+      dockerfile: Dockerfile    # Use the Dockerfile located in the root of your project
+    working_dir: /app/server    # Set the backend working directory inside the container
+    ports:
+      - "5000:5000"             # Expose port for backend
+    volumes:
+      - ./mern_project/server:/app/server  # Mount the backend code for live reloading
+    command: npm start
+    depends_on:
+      - frontend
+
+  frontend:
+    build:
+      context: ./mern_project   # Point to your main project folder
+      dockerfile: Dockerfile    # Use the same Dockerfile
+    working_dir: /app/client    # Set the frontend working directory inside the container
+    ports:
+      - "3000:3000"             # Expose port for frontend
+    volumes:
+      - ./mern_project/client:/app/client  # Mount the frontend code for live reloading
+    command: npm start
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"  # Nginx serves both frontend and backend
+    depends_on:
+      - frontend
